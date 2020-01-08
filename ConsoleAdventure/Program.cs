@@ -31,8 +31,8 @@ namespace ConsoleAdventure
             renderer.DrawBorder();
             renderer.DrawClear();
 
-            //MainMenu();
-            //CharacterCreation();
+            MainMenu();
+            CharacterCreation();
             Exploring();
 
             renderer.Render();
