@@ -31,8 +31,8 @@ namespace ConsoleAdventure
             renderer.DrawBorder();
             renderer.DrawClear();
 
-            MainMenu();
-            CharacterCreation();
+            //MainMenu();
+            //CharacterCreation();
             Exploring();
 
             renderer.Render();
@@ -956,7 +956,8 @@ namespace ConsoleAdventure
 
             menu = new Menu(((renderer.Width + 1) / 2 - standardMenuWidth / 2), (standardMenuY), standardMenuWidth, "Battle");
 
-            MenuText enemyDisplay = new MenuText("Enemy " + enemy.Name);
+            
+            MenuText enemyDisplay = new MenuText("Enemy: " + enemy.Name);
             menu.AddMenuItem(enemyDisplay);
 
             menu.AddBlankMenuItem();
@@ -967,16 +968,18 @@ namespace ConsoleAdventure
 
                 }
             };
+            menu.AddMenuItem(attackButton);
 
             menu.AddBlankMenuItem();
             MenuButton retreat = new MenuButton("Escape")
             {
                 ButtonEvent = () =>
                 {
-
+                    loopBattle = false;
                 }
             };
-
+            menu.AddMenuItem(retreat);
+            
             while (loopBattle)
             {
                 menu.Renderer(renderer);
