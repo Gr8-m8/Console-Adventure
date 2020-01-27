@@ -31,13 +31,13 @@ namespace ConsoleAdventure
 
     class Item_Equipable : Item
     {
-        int strengt = 0;
-        int endurance = 0;
-        int dexsterity = 0;
+        protected int strengt = 0;
+        protected int endurance = 0;
+        protected int dexsterity = 0;
 
-        int wisdom = 0;
-        int intelligence = 0;
-        int charisma = 0;
+        protected int wisdom = 0;
+        protected int intelligence = 0;
+        protected int charisma = 0;
 
         public Item_Equipable(string nameSet, int valueSet, int strSet, int endSet, int dexSet, int wisSet, int intSet, int chaSet) : base(nameSet, valueSet)
         {
@@ -66,6 +66,11 @@ namespace ConsoleAdventure
         public Item_Weapon(string nameSet, int valueSet, int strSet, int endSet, int dexSet, int wisSet, int intSet, int chaSet) : base(nameSet, valueSet, strSet, endSet, dexSet, wisSet, intSet, chaSet)
         {
 
+        }
+
+        public int Attack(Actor user)
+        {
+            return strengt * user.Strenght + dexsterity * user.Dexterity + endurance * user.Endurance + wisdom * user.Wisdom + intelligence * user.Intelligence + charisma * user.Charisma;
         }
     }
 

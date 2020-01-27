@@ -53,7 +53,10 @@ namespace ConsoleAdventure
 
         public void SelectIndex(int amount)
         {
-            Console.Beep(151, 100);
+            if (!Program.Mute)
+            {
+                Console.Beep(151, 100);
+            }
             selectIndex += amount;
 
             if (selectIndex < 0)
@@ -163,6 +166,7 @@ namespace ConsoleAdventure
                 buttonEvent = value;
             }
         }
+
         public MenuButton(string textSet) : base(textSet)
         {
 

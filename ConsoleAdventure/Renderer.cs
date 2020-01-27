@@ -39,24 +39,30 @@ namespace ConsoleAdventure
             Resize();
             foreach(KeyValuePair<string, Pixel> p in displayUpdate)
             {
+                
                 if (!display.ContainsKey(p.Key))
                 {
-                    display.Add(p.Key, new Pixel(p.Value.X, p.Value.Y, ConsoleColor.Black));
+                    display.Add(p.Key, new Pixel(p.Value.X, p.Value.Y, ConsoleColor.Red));
                 }
-
-                if (p.Value.Compare != display[p.Key].Compare || rerender)
+                
+                if (display.ContainsKey(p.Key))
                 {
-                    if (p.Value.X > -1 && 
-                        p.Value.X < width+1 &&
-                        p.Value.Y > -1 &&
-                        p.Value.Y < height+1)
+                    if (p.Value.Compare != display[p.Key].Compare || rerender)
                     {
-                        display[p.Key] = p.Value;
-                        Console.CursorLeft = p.Value.X;
-                        Console.CursorTop = p.Value.Y;
-                        Console.BackgroundColor = p.Value.Color;
-                        Console.ForegroundColor = p.Value.IconColor;
-                        Console.Write(p.Value.Icon);
+                        if (p.Value.X > -1 &&
+                            p.Value.X < width + 1 &&
+                            p.Value.Y > -1 &&
+                            p.Value.Y < height + 1)
+                        {
+                            display[p.Key] = p.Value;
+                            Console.CursorLeft = p.Value.X;
+                            Console.CursorTop = p.Value.Y;
+                            Console.BackgroundColor = p.Value.Color;
+                            Console.ForegroundColor = p.Value.IconColor;
+                            Console.Write(p.Value.Icon);
+                        }
+
+                        //System.Diagnostics.Debug.WriteLine(p.Value.Compare + "=" + display[p.Key].Compare);
                     }
                 }
             }
@@ -132,7 +138,7 @@ namespace ConsoleAdventure
                 }
                 else
                 {
-                    displayUpdate.Add(DisplayKey(x + i, y), new Pixel(x+i, y, ConsoleColor.Black, text[i], textColor));
+                    //displayUpdate.Add(DisplayKey(x + i, y), new Pixel(x+i, y, ConsoleColor.Black, text[i], textColor));
                 }
             }
         }
@@ -140,14 +146,15 @@ namespace ConsoleAdventure
 
     class Pixel
     {
-        int x;
-        int y;
+        readonly int x;
+        readonly int y;
         public int X => x;
         public int Y => y;
 
-        ConsoleColor color;
+        readonly ConsoleColor color;
         public ConsoleColor Color => color;
 
+        readonly string compare;
 
         char icon = ' ';
         public char Icon
@@ -183,14 +190,10 @@ namespace ConsoleAdventure
 
             icon = iconSet;
             iconColor = iconColorSet;
+
+            compare = (color + "|" + icon + "|" + iconColor);
         }
 
-        public string Compare
-        {
-            get
-            {
-                return (color + "|" + icon + "|" + iconColor).ToString();
-            }
-        }
+        public string Compare => (color + "|" + icon + "|" + iconColor);
     }
 }

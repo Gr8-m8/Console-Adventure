@@ -14,23 +14,52 @@ namespace ConsoleAdventure
 
         int skillPoints;
         int strenght;
+        public int Strenght => strenght;
         int endurance;
+        public int Endurance => endurance;
         int dexsterity;
+        public int Dexterity => dexsterity;
         int wisdom;
+        public int Wisdom => wisdom;
         int intelligence;
+        public int Intelligence => intelligence;
         int charisma;
+        public int Charisma => charisma;
+
+        int maxHealt = 100;
+        public int MaxHealth => maxHealt;
+        int healht = 100;
+        public int Health => healht;
+        bool dead = false;
+        public bool IsDead => dead;
+
+        public void HeathManager(int amount = 0)
+        {
+            healht = Math.Min(maxHealt, healht + amount);
+
+            if (healht <= 0)
+            {
+                dead = true;
+            }
+        }
+
+        List<Item> inventory = new List<Item>();
+        Item_Weapon weapon = new Item_Weapon("Unarmed", 0, 1, 0, 0, 0, 0, 0);
+        public Item_Weapon Weapon => weapon;
+        Item_Armor armor = new Item_Armor("Pesant Robes", 0, 0, 0, 0, 0, 0, 0);
 
         Actor_Description description;
         public Actor_Description Description => description;
 
-        Dictionary<string, Item> inventory = new Dictionary<string, Item>();
-
         public Actor(Random random)
         {
-            name = GenerateName(random, "RANDOM");
+            name = Program.GenerateName("RANDOM");
             description = new Actor_Description(name);
 
             this.InitilizeSkillPoints(0, 10, 10, 10, 10, 10, 10);
+
+            maxHealt = 10 * endurance;
+            healht = maxHealt;
         }
 
         public void InitilizeSkillPoints(int skp, int str, int end, int dex, int wis, int ilg, int cha)
@@ -44,86 +73,6 @@ namespace ConsoleAdventure
             charisma = cha;
         }
 
-        string GenerateName(Random random, string currentName)
-        {
-            if (currentName != "RANDOM")
-            {
-                return currentName;
-            }
-
-            char[] konsonants = new char[] { 'Q', 'W', 'R', 'T', 'P', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M' };
-            char[] voels = new char[] { 'E', 'Y', 'U', 'I', 'O', 'A' };
-            string nameOut = "";
-            int lenght = 0;
-            lenght = random.Next(3, 10);
-
-            for (int i = 0; i < 2; i++)
-            {
-                if (random.Next(100) < 50 + 30*i)
-                {
-                    nameOut += konsonants[random.Next(konsonants.Length)];
-                }
-                else
-                {
-                    nameOut += voels[random.Next(voels.Length)];
-                }
-            }
-
-            while (nameOut.Length < lenght)
-            {
-                if (konsonants.Contains(nameOut[nameOut.Length - 1]))
-                {
-                    if (konsonants.Contains(nameOut[nameOut.Length - 2]))
-                    {
-                        nameOut += voels[random.Next(voels.Length)];
-                    }
-                    else
-                    {
-                        if (random.Next(100) < 50)
-                        {
-                            nameOut += konsonants[random.Next(konsonants.Length)];
-                        }
-                        else
-                        {
-                            nameOut += voels[random.Next(voels.Length)];
-                        }
-                    }
-                }
-                else if (voels.Contains(nameOut[nameOut.Length - 1]))
-                {
-                    if (voels.Contains(nameOut[nameOut.Length - 2]))
-                    {
-                        nameOut += konsonants[random.Next(konsonants.Length)];
-                    }
-                    else
-                    {
-                        if (random.Next(100) < 80)
-                        {
-                            nameOut += konsonants[random.Next(konsonants.Length)];
-                        }
-                        else
-                        {
-                            nameOut += voels[random.Next(voels.Length)];
-                        }
-                    }
-                }
-                else
-                {
-                    if (random.Next(100) < 50)
-                    {
-                        nameOut += konsonants[random.Next(konsonants.Length)];
-                    }
-                    else
-                    {
-                        nameOut += voels[random.Next(voels.Length)];
-                    }
-                }
-            }
-
-            return nameOut;
-        }
-
-        
     }
 
     class Actor_Description

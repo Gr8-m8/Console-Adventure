@@ -36,7 +36,7 @@ namespace ConsoleAdventure
             }
         }
 
-        char tileIndicator = 'I';
+        readonly char tileIndicator = 'I';
         ConsoleColor decorationColor = ConsoleColor.Black;
         char decoration = ' ';
         
@@ -142,7 +142,7 @@ namespace ConsoleAdventure
                     break;
 
                 case TileType.City:
-                    color = ConsoleColor.Gray;
+                    color = ConsoleColor.DarkGray;
                     decorationColor = ConsoleColor.Yellow;
                     decoration = 'H';
                     break;

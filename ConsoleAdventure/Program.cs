@@ -9,7 +9,9 @@ namespace ConsoleAdventure
 {
     class Program
     {
-        static string gameTitle = "Console Adventure!";
+        readonly static string gameTitle = "Console Adventure!";
+
+        public static bool Mute => false;
 
         static Random random = new Random();
 
@@ -21,25 +23,31 @@ namespace ConsoleAdventure
         static Player player = new Player(random);
 
 
-        static int standardMenuWidth = 48;
-        static int standardMenuY = renderer.Height / 2 - 10 / 2 - 2;
+        readonly static int standardMenuWidth = 48;
+        readonly static int standardMenuY = renderer.Height / 2 - 10 / 2 - 2;
 
         static void Main()
         {
             Console.Title = gameTitle;
 
+            renderer = new Renderer();
+
+            world = new World(random);
+            player = new Player(random);
+
             renderer.DrawBorder();
             renderer.DrawClear();
 
-            //MainMenu();
+            MainMenu();
             //CharacterCreation();
             Exploring();
 
             renderer.Render();
+
             Console.ReadKey();
         }
 
-        static void KeyEvent()
+        static void KeyEvent(bool exploring = false)
         {
             if (Console.KeyAvailable)
             {
@@ -50,7 +58,10 @@ namespace ConsoleAdventure
 
                     case ConsoleKey.F5:
                     case ConsoleKey.Escape:
-                        Console.Beep(100, 100);
+                        if (!Program.Mute)
+                        {
+                            Console.Beep(100, 100);
+                        }
                         Environment.Exit(0);
                         break;
 
@@ -62,39 +73,58 @@ namespace ConsoleAdventure
                         menu.EventCheck();
                         break;
 
-                    case ConsoleKey.UpArrow:
-                        menu.SelectIndex(-1);
-                        break;
-
-                    case ConsoleKey.Tab:
-                    case ConsoleKey.DownArrow:
-                        menu.SelectIndex(1);
-                        break;
-
                     case ConsoleKey.W:
-                        world.CurrentMap.MoveCamera(0, -1, true);
+                    case ConsoleKey.UpArrow:
+                        if (exploring)
+                        {
+                            world.CurrentMap.MoveCamera(0, -1);
+                        }
+                        else
+                        {
+                            menu.SelectIndex(-1);
+                        }
                         break;
 
                     case ConsoleKey.S:
-                        world.CurrentMap.MoveCamera(0, 1, true);
+                    case ConsoleKey.DownArrow:
+                        if (exploring)
+                        {
+                            world.CurrentMap.MoveCamera(0, 1);
+                        }
+                        else
+                        {
+                            menu.SelectIndex(1);
+                        }
                         break;
 
                     case ConsoleKey.A:
-                        world.CurrentMap.MoveCamera(-1, 0, true);
+                    case ConsoleKey.LeftArrow:
+                        if (exploring)
+                        {
+                            world.CurrentMap.MoveCamera(-1, 0);
+                        }
                         break;
 
                     case ConsoleKey.D:
-                        world.CurrentMap.MoveCamera(1, 0, true);
+                    case ConsoleKey.RightArrow:
+                        if (exploring)
+                        {
+                            world.CurrentMap.MoveCamera(1, 0);
+                        }
                         break;
 
                     case ConsoleKey.Spacebar:
                         world.EnterExitInteriorExterior();
                         break;
+
+                    case ConsoleKey.Tab:
+                        menu.SelectIndex(1);
+                        break;
                 }
             }
         }
 
-        static void MainMenu()
+        public static void MainMenu()
         {
             Console.Title = gameTitle + " Main Menu";
 
@@ -107,7 +137,10 @@ namespace ConsoleAdventure
             {
                 ButtonEvent = () => 
                 {
-                    Console.Beep(121, 100);
+                    if (!Program.Mute)
+                    {
+                        Console.Beep(121, 100);
+                    }
                     loopMainMenu = false;
                 }
             });
@@ -117,7 +150,10 @@ namespace ConsoleAdventure
             {
                 ButtonEvent = () =>
                 {
-                    Console.Beep(121, 100);
+                    if (!Program.Mute)
+                    {
+                        Console.Beep(121, 100);
+                    }
                     Menu startMenu = menu;
 
                     renderer.DrawBox(1, 1, renderer.Width - 1, renderer.Height - 1, ConsoleColor.Black);
@@ -127,7 +163,10 @@ namespace ConsoleAdventure
                     {
                         ButtonEvent = () =>
                         {
-                            Console.Beep(121, 100);
+                            if (!Program.Mute)
+                            {
+                                Console.Beep(121, 100);
+                            }
                             renderer.DrawBox(1, 1, renderer.Width - 1, renderer.Height - 1, ConsoleColor.Black);
                             menu = startMenu;
                         }
@@ -140,7 +179,10 @@ namespace ConsoleAdventure
             {
                 ButtonEvent = () => 
                 {
-                    Console.Beep(121, 100);
+                    if (!Program.Mute)
+                    {
+                        Console.Beep(121, 100);
+                    }
                     Menu startMenu = menu;
 
                     renderer.DrawBox(1, 1, renderer.Width - 1, renderer.Height - 1, ConsoleColor.Black);
@@ -150,7 +192,10 @@ namespace ConsoleAdventure
                     {
                         ButtonEvent = () =>
                         {
-                            Console.Beep(121, 100);
+                            if (!Program.Mute)
+                            {
+                                Console.Beep(121, 100);
+                            }
                             renderer.DrawBox(1, 1, renderer.Width - 1, renderer.Height - 1, ConsoleColor.Black);
                             menu = startMenu;
                         }
@@ -163,10 +208,13 @@ namespace ConsoleAdventure
             {
                 ButtonEvent = () => 
                 {
-                    Console.Beep(121, 100);
+                    if (!Program.Mute)
+                    {
+                        Console.Beep(121, 100);
+                    }
                     Menu startMenu = menu;
 
-                    renderer.DrawBox(1, 1, renderer.Width - 1, renderer.Height - 1, ConsoleColor.Black);
+                    renderer.DrawClear();
                     menu = new Menu(((renderer.Width + 1) / 2 - standardMenuWidth / 2), (standardMenuY), standardMenuWidth, "Credits  ");
 
                     menu.AddMenuItem(new MenuText("Game Created by Martin Lindblad"));
@@ -176,7 +224,10 @@ namespace ConsoleAdventure
                     {
                         ButtonEvent = () =>
                         {
-                            Console.Beep(121, 100);
+                            if (!Program.Mute)
+                            {
+                                Console.Beep(121, 100);
+                            }
                             renderer.DrawBox(1, 1, renderer.Width - 1, renderer.Height - 1, ConsoleColor.Black);
                             menu = startMenu;
                         }
@@ -189,12 +240,18 @@ namespace ConsoleAdventure
             {
                 ButtonEvent = () =>
                 {
-                    Console.Beep(100, 100);
+                    if (!Program.Mute)
+                    {
+                        Console.Beep(100, 100);
+                    }
                     Environment.Exit(0);
                 }
             });
 
-            Console.Beep(100, 100);
+            if (!Program.Mute)
+            {
+                Console.Beep(100, 100);
+            }
 
             while (loopMainMenu)
             {
@@ -881,8 +938,13 @@ namespace ConsoleAdventure
             Console.ReadKey();
         }
 
-        static void Exploring()
+        public static void Exploring()
         {
+            if (world == null)
+            {
+                return;
+            }
+
             Console.Title = gameTitle + " Exploring";
 
             bool loopExploring = true;
@@ -936,7 +998,7 @@ namespace ConsoleAdventure
                 world.Render(renderer);
                 menu.Renderer(renderer);
                 renderer.Render();
-                KeyEvent();
+                KeyEvent(true);
             }
         }
 
@@ -957,7 +1019,7 @@ namespace ConsoleAdventure
             menu = new Menu(((renderer.Width + 1) / 2 - standardMenuWidth / 2), (standardMenuY), standardMenuWidth, "Battle");
 
             
-            MenuText enemyDisplay = new MenuText("Enemy: " + enemy.Name);
+            MenuText enemyDisplay = new MenuText("Enemy: " + enemy.Name + ": " + enemy.Health);
             menu.AddMenuItem(enemyDisplay);
 
             menu.AddBlankMenuItem();
@@ -965,7 +1027,7 @@ namespace ConsoleAdventure
             {
                 ButtonEvent = () =>
                 {
-
+                    enemy.HeathManager(-player.Weapon.Attack(player));
                 }
             };
             menu.AddMenuItem(attackButton);
@@ -982,14 +1044,19 @@ namespace ConsoleAdventure
             
             while (loopBattle)
             {
+                enemyDisplay.Text = "Enemy: " + enemy.Name + ": " + enemy.Health;
+                if (enemy.IsDead)
+                {
+                    loopBattle = false;
+                }
+
                 menu.Renderer(renderer);
                 renderer.Render();
                 KeyEvent();
             }
-
         }
 
-        public static void Dialog(string[] description, string[] choises, int[] choiseResult)
+        public static void Dialog(Actor actor = null)
         {
             Console.Title = gameTitle + " Dialog";
 
@@ -1006,6 +1073,64 @@ namespace ConsoleAdventure
                 renderer.Render();
                 KeyEvent();
             }
+        }
+
+        public static string GenerateName(string currentName = "RANDOM")
+        {
+            if (currentName != "RANDOM")
+            {
+                return currentName;
+            }
+
+            char[] konsonants = new char[] { 'Q', 'W', 'R', 'T', 'P', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M' };
+            char[] voels = new char[] { 'E', 'Y', 'U', 'I', 'O', 'A' };
+
+            Dictionary<char, char[]> ctrail = new Dictionary<char, char[]>
+            {
+                { 'Q', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A' } },
+                { 'W', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A', 'R' } },
+                { 'R', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A' } },
+                { 'T', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A', 'R', 'T', 'H' } },
+                { 'P', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A', 'R', 'P' } },
+                { 'S', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A', 'T', 'P', 'S', 'K', 'L', 'V', 'N', 'M' } },
+                { 'D', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A', 'R' } },
+                { 'F', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A', 'R', 'L', 'N' } },
+                { 'G', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A', 'R', 'J', 'L', 'N' } },
+                { 'H', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A', 'R', 'S', 'D', 'G', 'H', 'J', 'L', 'V', 'N', 'M' } },
+                { 'J', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A' } },
+                { 'K', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A', 'R', 'T', 'S', 'D', 'L' } },
+                { 'L', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A', 'L', 'J' } },
+                { 'Z', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A' } },
+                { 'X', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A' } },
+                { 'C', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A', 'K' } },
+                { 'V', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A' } },
+                { 'B', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A', 'R', 'S', 'H', 'L' } },
+                { 'N', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A' } },
+                { 'M', new char[] { 'E', 'Y', 'U', 'I', 'O', 'A' } },
+                { 'E', new char[] { 'Q', 'W', 'R', 'T', 'P', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M' } },
+                { 'Y', new char[] { 'Q', 'W', 'R', 'T', 'P', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M' } },
+                { 'U', new char[] { 'Q', 'W', 'R', 'T', 'P', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M' } },
+                { 'I', new char[] { 'Q', 'W', 'R', 'T', 'P', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M' } },
+                { 'O', new char[] { 'Q', 'W', 'R', 'T', 'P', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M' } },
+                { 'A', new char[] { 'Q', 'W', 'R', 'T', 'P', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M' } }
+            };
+
+            string nameOut = "";
+            int lenght = 0;
+            lenght = random.Next(3, 10);
+
+            nameOut += ctrail.ElementAt(random.Next(ctrail.Count)).Key;
+
+            while (nameOut.Length < lenght)
+            {
+                nameOut += ctrail[nameOut.Last()][random.Next(ctrail[nameOut.Last()].Length)];
+            }
+            return nameOut;
+        }
+
+        public static int SkillCheck(Actor actor)
+        {
+            return random.Next(1, 21);
         }
     }
 }

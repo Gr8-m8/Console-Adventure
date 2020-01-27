@@ -26,6 +26,8 @@ namespace ConsoleAdventure
         protected Tile selectedTile;
         public Tile SelectedTile => selectedTile;
 
+        public bool Generated => tiles.Count > 0;
+
         protected int cameraX = 0;
         public int CameraX => cameraX;
         protected int cameraY = 0;
@@ -53,93 +55,13 @@ namespace ConsoleAdventure
 
         public Map(Random random)
         {
-            //GenerateMap(random);
-            name = GenerateName(random);
+            name = Program.GenerateName("RANDOM");
             selectedTile = new Tile(Tile.TileType.Void);            
         }
 
-        string GenerateName(Random random, string currentName = "RANDOM")
+        public void MoveCamera(int x, int y)
         {
-            if (currentName != "RANDOM")
-            {
-                return currentName;
-            }
-
-            char[] konsonants = new char[] { 'Q', 'W', 'R', 'T', 'P', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M' };
-            char[] voels = new char[] { 'E', 'Y', 'U', 'I', 'O', 'A' };
-            string nameOut = "";
-            int lenght = 0;
-            lenght = random.Next(3, 10);
-
-            for (int i = 0; i < 2; i++)
-            {
-                if (random.Next(100) < 50 + 30 * i)
-                {
-                    nameOut += konsonants[random.Next(konsonants.Length)];
-                }
-                else
-                {
-                    nameOut += voels[random.Next(voels.Length)];
-                }
-            }
-
-            while (nameOut.Length < lenght)
-            {
-                if (konsonants.Contains(nameOut[nameOut.Length - 1]))
-                {
-                    if (konsonants.Contains(nameOut[nameOut.Length - 2]))
-                    {
-                        nameOut += voels[random.Next(voels.Length)];
-                    }
-                    else
-                    {
-                        if (random.Next(100) < 50)
-                        {
-                            nameOut += konsonants[random.Next(konsonants.Length)];
-                        }
-                        else
-                        {
-                            nameOut += voels[random.Next(voels.Length)];
-                        }
-                    }
-                }
-                else if (voels.Contains(nameOut[nameOut.Length - 1]))
-                {
-                    if (voels.Contains(nameOut[nameOut.Length - 2]))
-                    {
-                        nameOut += konsonants[random.Next(konsonants.Length)];
-                    }
-                    else
-                    {
-                        if (random.Next(100) < 80)
-                        {
-                            nameOut += konsonants[random.Next(konsonants.Length)];
-                        }
-                        else
-                        {
-                            nameOut += voels[random.Next(voels.Length)];
-                        }
-                    }
-                }
-                else
-                {
-                    if (random.Next(100) < 50)
-                    {
-                        nameOut += konsonants[random.Next(konsonants.Length)];
-                    }
-                    else
-                    {
-                        nameOut += voels[random.Next(voels.Length)];
-                    }
-                }
-            }
-
-            return nameOut;
-        }
-
-        public void MoveCamera(int x, int y, bool beep = false)
-        {
-            if (beep)
+            if (!Program.Mute)
             {
                 Console.Beep(121, 100);
             }
@@ -159,16 +81,19 @@ namespace ConsoleAdventure
                     selectedTile.IndicatorColor = ConsoleColor.Red;
                     selectedTile.Indicator = 'X';
                 }
+
+                selectedTile.Trigger();
+                //Program.Exploring();
             }
         }
 
-        protected virtual void GenerateMap(Random random)
+        public virtual void GenerateMap(Random random)
         {
             tiles.Add(TileKey(0, 0), new Tile(Tile.TileType.Void));
             MoveCamera(0, 0);
         }
 
-        protected virtual void RenderBackground(Renderer renderer, ConsoleColor color = ConsoleColor.Black, char icon = ' ', ConsoleColor iconColor = ConsoleColor.White)
+        protected virtual void RenderBackground(Renderer renderer, ConsoleColor color, char icon, ConsoleColor iconColor)
         {
             renderer.DrawBox(3, 1, renderer.Width - 5, renderer.Height - 2, color);
 
@@ -186,7 +111,7 @@ namespace ConsoleAdventure
             offsetX = renderer.Width / 2 - scale;
             offsetY = renderer.Height / 2 - scale;
 
-            RenderBackground(renderer);
+            RenderBackground(renderer, ConsoleColor.Black, ' ', ConsoleColor.White);
 
             for (int y = -offsetY; y * scale < renderer.Height; y++)
             {
@@ -205,7 +130,7 @@ namespace ConsoleAdventure
                         }
                     }
                 }
-            }
+            }  
         }
     }
 
@@ -213,10 +138,10 @@ namespace ConsoleAdventure
     {
         public Map_Island(Random random) : base(random)
         {
-            GenerateMap(random);
+            //GenerateMap(random);
         }
 
-        protected override void GenerateMap(Random random)
+        public override void GenerateMap(Random random)
         {
             int tilesNumber = random.Next(40, 100);
             Tile.TileType[] tileTypes = new Tile.TileType[] { Tile.TileType.Mountain, Tile.TileType.Plain, Tile.TileType.Forest, Tile.TileType.Dessert };
@@ -277,18 +202,18 @@ namespace ConsoleAdventure
 
     class Map_Tile : Map
     {
-        Tile.TileType tileType;
-        Map exterior;
+        readonly Tile.TileType tileType;
+        readonly Map exterior;
 
 
         public Map_Tile(Random random, Tile.TileType tileTypeSet, Map exteriorSet) : base(random)
         {
             tileType = tileTypeSet;
             exterior = exteriorSet;
-            GenerateMap(random);
+            //GenerateMap(random);
         }
 
-        protected override void GenerateMap(Random random)
+        public override void GenerateMap(Random random)
         {
             Tile.TileType[] tileTypes = new Tile.TileType[] { Tile.TileType.Mountain, Tile.TileType.Plain, Tile.TileType.Forest, Tile.TileType.Dessert, Tile.TileType.Water };
             int clutter = random.Next(5, 20);
@@ -366,11 +291,11 @@ namespace ConsoleAdventure
         public Map_City(Random random, Map exteriorSet) : base(random)
         {
             exterior = exteriorSet;
-            GenerateMap(random);
             name = exterior.Name + " CITY";
+            //GenerateMap(random);
         }
 
-        protected override void GenerateMap(Random random)
+        public override void GenerateMap(Random random)
         {
             int offset = 8;
 
@@ -466,17 +391,29 @@ namespace ConsoleAdventure
 
             foreach (KeyValuePair<string, Tile> t in tiles)
             {
-                if (t.Value.TilesType != Tile.TileType.Building)
-                {
-                    t.Value.Exsterior = exterior;
-                }
-                
                 if (t.Value.TilesType == Tile.TileType.Building)
                 {
-                    t.Value.Interior = new Map_Trigger(random, this, () => { Program.Battle(); });
                     Actor owner = new Actor(random);
                     citizens.Add(owner);
-                    t.Value.Interior.Name = owner.Name + "'S HOUSE";
+                    t.Value.Trigger = () => 
+                    {
+                        Program.Battle(owner);
+                        if (owner.IsDead)
+                        {
+                            t.Value.Trigger = () =>
+                            {
+
+                            };
+                        }
+                        Program.Exploring();
+                    };
+                    t.Value.Interior = new Map_Dungeon(random, this)
+                    {
+                        Name = owner.Name + "'S HOUSE"
+                    };
+                } else
+                {
+                    t.Value.Exsterior = exterior;
                 }
             }
             
@@ -490,47 +427,29 @@ namespace ConsoleAdventure
         }
     }
 
-    class Map_Trigger : Map
+    class Map_Dungeon : Map
     {
         Map exterior;
 
-        Action trigger = () =>
-        {
-
-        };
-
-        Action Trigger
-        {
-            get
-            {
-                return trigger;
-            }
-            set
-            {
-                trigger = value;
-            }
-        }
-
-        public Map_Trigger(Random random, Map exteriorSet, Action triggerSet) : base(random)
+        public Map_Dungeon(Random random, Map exteriorSet) : base(random)
         {
             exterior = exteriorSet;
-            GenerateMap(random);
-            trigger = triggerSet;
+            //GenerateMap(random);
         }
 
-        public void TriggerActivate()
+        public override void GenerateMap(Random random)
         {
-            trigger();
-        }
-
-        protected override void GenerateMap(Random random)
-        {
-            Tile trigger = new Tile(Tile.TileType.Void);
-            trigger.Exsterior = exterior;
-            tiles.Add(TileKey(0, 0), trigger);
-
+            Tile t = new Tile(Tile.TileType.Void)
+            {
+                Exsterior = exterior
+            };
+            tiles.Add(TileKey(0, 0), t);
             MoveCamera(0, 0);
         }
 
+        protected override void RenderBackground(Renderer renderer, ConsoleColor color = ConsoleColor.Black, char icon = ' ', ConsoleColor iconColor = ConsoleColor.White)
+        {
+            base.RenderBackground(renderer, ConsoleColor.Black, '-', ConsoleColor.DarkGray);
+        }
     }
 }
